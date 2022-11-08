@@ -1,7 +1,9 @@
 <?php
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST');
+header('Access-Control-Allow-Methods: *');
 header("Access-Control-Allow-Headers: X-Requested-With");
+$queryStrings = array();
+$superHeroSearch = null;
 
 $superheroes = [
   [
@@ -66,10 +68,47 @@ $superheroes = [
   ], 
 ];
 
+
+if (parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY)) {
+    parse_str($_SERVER['QUERY_STRING'], $queryStrings);
+    $superHeroSearch = $queryStrings['query'];
+}
+
+function findHero($hero, $superheroes)
+{
+    foreach ($superheroes as $superhero) {
+        if ($hero == $superhero['alias'] || $hero == $superhero['name']) {
+            return  [
+                "id" => $superhero['id'],
+                "name" => $superhero['name'],
+                "alias" => $superhero['alias'],
+                "biography" => $superhero['biography'],
+            ];
+        }
+    }
+    return null;
+}
+
+$SuperHeroSearchAnswer = findHero($superHeroSearch, $superheroes);
 ?>
 
-<ul>
-<?php foreach ($superheroes as $superhero): ?>
-  <li><?= $superhero['alias']; ?></li>
-<?php endforeach; ?>
-</ul>
+
+<?php if (!empty($superHeroSearch)) { ?>
+    <?php if (!empty($SuperHeroSearchAnswer)) { ?>
+         <div>
+            <h3><?= $SuperHeroSearchAnswer['alias']; ?></h3>
+            <h4><?= $SuperHeroSearchAnswer['name']; ?></h4>
+            <p><?= $SuperHeroSearchAnswer['biography']; ?></p>
+        </div>
+    <?php } else { ?>
+       <h3>Super Hero not found</h3>
+    <?php } ?>
+<?php } else { ?>
+    <ul>
+        <?php foreach ($superheroes as $superhero) : ?>
+            <li><?= $superhero['alias']; ?></li>
+        <?php endforeach; ?>
+    </ul>
+<?php } ?>
+
+
