@@ -2,8 +2,6 @@
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: *');
 header("Access-Control-Allow-Headers: X-Requested-With");
-$queryStrings = array();
-$superHeroSearch = null;
 
 $superheroes = [
   [
@@ -67,48 +65,40 @@ $superheroes = [
       "biography" => "Notably powerful, Wanda Maximoff has fought both against and with the Avengers, attempting to hone her abilities and do what she believes is right to help the world.",
   ], 
 ];
-
-
-if (parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY)) {
-    parse_str($_SERVER['QUERY_STRING'], $queryStrings);
-    $superHeroSearch = $queryStrings['query'];
-}
-
-function findHero($hero, $superheroes)
-{
-    foreach ($superheroes as $superhero) {
-        if ($hero == $superhero['alias'] || $hero == $superhero['name']) {
-            return  [
-                "id" => $superhero['id'],
-                "name" => $superhero['name'],
-                "alias" => $superhero['alias'],
-                "biography" => $superhero['biography'],
-            ];
-        }
-    }
-    return null;
-}
-
-$SuperHeroSearchAnswer = findHero($superHeroSearch, $superheroes);
 ?>
 
 
-<?php if (!empty($superHeroSearch)) { ?>
-    <?php if (!empty($SuperHeroSearchAnswer)) { ?>
-         <div>
-            <h3><?= $SuperHeroSearchAnswer['alias']; ?></h3>
-            <h4><?= $SuperHeroSearchAnswer['name']; ?></h4>
-            <p><?= $SuperHeroSearchAnswer['biography']; ?></p>
-        </div>
-    <?php } else { ?>
-       <h3>Super Hero not found</h3>
-    <?php } ?>
-<?php } else { ?>
-    <ul>
-        <?php foreach ($superheroes as $superhero) : ?>
-            <li><?= $superhero['alias']; ?></li>
-        <?php endforeach; ?>
-    </ul>
+<?php
+    $inq = $_GET["h"];
+    $found=[];
+    $count=0;
+    
+    $inquiry =filter_var($inq, FILTER_SANITIZE_STRING);
+
+    foreach($superheroes as $hero){
+        if (array_search($inquiry,$hero)){
+            $found=$hero;
+            $count= $count + 1;
+        }
+    }
+?>
+
+<?php if($inquiry!=""){?>
+
+    <?php if($count > 0){ ?>
+    <h3><?php echo($found["alias"]);?></h3>
+    <h4><?php echo("A.K.A ".$found["name"]."<br>");?></h4>
+        
+    <p><?php echo($found["biography"]."<br>");?></p>
+    <?php }else{
+            echo("Superhero not found");
+    } ?>
+<?php }else{ ?>
+<ul>
+<?php foreach ($superheroes as $superhero): ?>
+<li><?= $superhero['alias']; ?></li>
+<?php endforeach; ?>
+</ul>
 <?php } ?>
 
 

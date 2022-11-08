@@ -1,5 +1,8 @@
 window.onload = function(){
     let searchbtn = document.getElementById("btn");
+    var httpRequest;
+    let value1 = document.querySelector("#search-hero").value
+    var hero;
 
     // searchbtn.addEventListener("click",()=>{
     //     // e.preventDefault();
@@ -27,39 +30,19 @@ window.onload = function(){
     //     }
     
     // })
-    function getAllSuperHeroes() {
-    return fetch("http://localhost:8888/info2180-lab4/superheroes.php")
-      .then((result) => result.text())
-      .then((data) => data)
-      .catch((err) => err);
-    }
 
-    function getSpecificHero(hero) {
-    return fetch(`http://localhost:8888/info2180-lab4/superheroes.php?query=${hero}`)
-      .then((result) => result.text())
-      .then((data) => data)
-      .catch((err) => err);
-    }
+     searchbtn.addEventListener('click', function(e){
+        e.preventDefault();
+        httpRequest= new XMLHttpRequest();
+        hero=value1.trim();
+         httpRequest.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                document.getElementById("result").innerHTML = this.responseText;
+            }
+         }
+         httpRequest.open('GET', 'superheroes.php?h='+hero);
+         httpRequest.send();
 
-    function usedata(response){
-        document.getElementById("result").innerHTML = response;
-    }
-
-    function searchHeroes(search) {
-    if (search === null || sanitizer(search) === "")
-      return getAllSuperHeroes();
-    return getSpecificHero(search);
-    }
-
-
-    function sanitizer(str){
-        str = str.replace(/[^a-z0-9áéíóúñü \.,_-]/gim, " ");
-        return str.trim()
-    }
-
-    searchbtn.addEventListener("click", ()=> {
-    searchHeroes(document.getElementById("search-hero").value).then(
-        (data) => (document.getElementById("result").innerHTML=data)
-    )
-  })
+    });
+    
 };
